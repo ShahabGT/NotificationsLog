@@ -11,10 +11,13 @@ class MyApplication : Application() {
         Realm.init(this)
         val config = RealmConfiguration.Builder()
             .name("notification.realm")
-            .schemaVersion(2)
+            .schemaVersion(6)
             .allowWritesOnUiThread(true)
             .allowQueriesOnUiThread(true)
-            .deleteRealmIfMigrationNeeded()
+            .migration { realm, oldVersion, newVersion ->
+                if(newVersion>oldVersion)
+                    realm.schema.get("NotificationModel")!!.addField("visible",Boolean::class.java)
+            }
             .build()
         Realm.setDefaultConfiguration(config)
     }

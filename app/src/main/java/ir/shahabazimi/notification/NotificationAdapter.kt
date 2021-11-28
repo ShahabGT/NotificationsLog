@@ -16,9 +16,7 @@ import io.realm.RealmRecyclerViewAdapter
 
 class NotificationAdapter(
     private val ctx: Context,
-    data: OrderedRealmCollection<NotificationModel>,
-    private val actionDown: (String) -> Unit,
-    private val actionUp: () -> Unit
+    data: OrderedRealmCollection<NotificationModel>
 ) :
     RealmRecyclerViewAdapter<NotificationModel, NotificationAdapter.ViewHolder>(data, true) {
 
@@ -35,10 +33,10 @@ class NotificationAdapter(
             LayoutInflater.from(parent.context).inflate(R.layout.row_notification, parent, false)
         )
 
-    @SuppressLint("ClickableViewAccessibility")
+    @SuppressLint("ClickableViewAccessibility", "SetTextI18n")
     override fun onBindViewHolder(h: ViewHolder, position: Int) {
         val model = getItem(position)
-        if (model != null && model.title.isNotEmpty()) {
+        if (model != null) {
             h.title.text = model.title
             h.text.text = model.text
             h.text.visibility = if (model.text.isEmpty())
@@ -50,14 +48,14 @@ class NotificationAdapter(
             h.date.text = "${model.date} ${model.time}"
 
 
-            h.itemView.setOnTouchListener { v, event ->
-                if (event.action === MotionEvent.ACTION_DOWN) {
-                    actionDown(model.key)
-                } else {
-                    actionUp()
-                }
-                true
-            }
+//            h.itemView.setOnTouchListener { v, event ->
+//                if (event.action === MotionEvent.ACTION_DOWN) {
+//                    actionDown(model.key)
+//                } else {
+//                    actionUp()
+//                }
+//                true
+//            }
         }
 
     }

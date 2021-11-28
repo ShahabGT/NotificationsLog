@@ -3,6 +3,7 @@ package ir.shahabazimi.notification
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import io.realm.Realm
+import io.realm.kotlin.where
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -10,7 +11,8 @@ class NotificationService : NotificationListenerService() {
 
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
         if (sbn != null) {
-            Realm.getDefaultInstance().executeTransaction {
+            Realm.getDefaultInstance().executeTransactionAsync {
+                val visible = it.where<NotificationModel>().equalTo("packageName",sbn.packageName).findFirst()?.visible ?: false
 
                 it.insert(
                     NotificationModel(
@@ -20,6 +22,7 @@ class NotificationService : NotificationListenerService() {
                         sbn.notification.extras.getString("android.text", ""),
                         SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(Date(sbn.postTime)),
                         SimpleDateFormat("HH:mm:ss", Locale.ENGLISH).format(Date(sbn.postTime)),
+                        visible
                     )
                 )
             }
