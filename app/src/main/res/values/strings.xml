@@ -6,4 +6,7 @@
 
     <string name="main_fab_content">this is used to filter date</string>
 
+    <string name="notification_empty_title">Noting Found :(</string>
+    <string name="notification_empty_logo_content">no content found image</string>
+
 </resources>

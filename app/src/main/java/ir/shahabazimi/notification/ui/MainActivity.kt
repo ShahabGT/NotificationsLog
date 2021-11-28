@@ -2,13 +2,16 @@ package ir.shahabazimi.notification.ui
 
 import android.content.pm.PackageManager
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.realm.Realm
+import io.realm.Sort
 import io.realm.kotlin.where
 import ir.shahabazimi.notification.NotificationModel
 import ir.shahabazimi.notification.R
+import ir.shahabazimi.notification.SharedViewModel
 import ir.shahabazimi.notification.databinding.ActivityMainBinding
 import java.text.SimpleDateFormat
 import java.util.*
@@ -21,6 +24,7 @@ class MainActivity : AppCompatActivity() {
     private var date by Delegates.observable("") { _, _, newValue ->
       b.topAppBar.title = getString(R.string.main_date, newValue)
     }
+    private val viewModel: SharedViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,6 +68,7 @@ class MainActivity : AppCompatActivity() {
 
 
         datePicker.addOnPositiveButtonClickListener {
+            viewModel.selectDate(it)
 //            notificationAdapter.updateData(
 //                db.where<NotificationModel>().equalTo(
 //                    "date",
