@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="?attr/materialCardViewFilledStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginStart="8dp"
@@ -30,8 +30,8 @@
             android:textIsSelectable="true"
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@id/row_notification_text"
-            app:layout_constraintStart_toEndOf="@id/row_notification_icon"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/row_notification_icon"
             app:layout_constraintTop_toTopOf="parent" />
 
 
@@ -42,8 +42,8 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="6dp"
             android:textIsSelectable="true"
-            app:layout_constraintStart_toEndOf="@id/row_notification_icon"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/row_notification_icon"
             app:layout_constraintTop_toBottomOf="@+id/row_notification_title" />
 
         <com.google.android.material.textview.MaterialTextView
