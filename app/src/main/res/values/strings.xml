@@ -3,6 +3,7 @@
 
     <string name="main_date">%s</string>
     <string name="appbar_menu_filter">Filter</string>
+    <string name="appbar_menu_date">Select Date</string>
 
     <string name="main_fab_content">this is used to filter date</string>
 

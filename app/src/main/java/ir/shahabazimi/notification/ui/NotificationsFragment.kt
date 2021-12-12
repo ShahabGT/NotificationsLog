@@ -43,7 +43,6 @@ class NotificationsFragment : Fragment() {
         db = Realm.getDefaultInstance()
         notificationAdapter = NotificationAdapter(
             requireContext(), db.where<NotificationModel>()
-                .equalTo("visible", true)
                 .equalTo(
                     "date",
                     SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(
@@ -52,7 +51,7 @@ class NotificationsFragment : Fragment() {
                 )
                 .isNotEmpty("title")
                 .sort("time", Sort.DESCENDING)
-                .findAllAsync()
+                .findAll()
         )
         b.notificationsRecycler.apply {
             adapter = notificationAdapter
@@ -67,23 +66,38 @@ class NotificationsFragment : Fragment() {
             })
         }
 
+        b.notificationsRecycler.adapter
+
         viewModel.selectedDate.observe(viewLifecycleOwner) {
             notificationAdapter.updateData(
                 db.where<NotificationModel>().equalTo(
                     "date",
                     SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(Date(it))
                 )
-                    .equalTo("visible", true)
                     .isNotEmpty("title")
                     .sort("time", Sort.DESCENDING)
-                    .findAllAsync()
+                    .findAll()
 
 
             )
+            emptyDetector()
         }
+        viewModel.filteredData.observe(viewLifecycleOwner){ visible->
+            notificationAdapter.updateData(db.where<NotificationModel>().`in`("appName",visible.toTypedArray()).findAll())
+            emptyDetector()
+
+        }
+        emptyDetector()
 
         onClicks()
 
+    }
+
+    private fun emptyDetector(){
+        if(notificationAdapter.itemCount==0)
+            b.notificationEmpty.visibility=View.VISIBLE
+        else
+            b.notificationEmpty.visibility=View.INVISIBLE
     }
 
     private fun onClicks() {

@@ -14,4 +14,13 @@ class SharedViewModel : ViewModel() {
         if (date != null)
             mutableSelectedDate.value = date
     }
+
+
+    private val mutableFilterData = MutableLiveData<List<String>>()
+    val filteredData: LiveData<List<String>> get() = mutableFilterData
+
+    fun filterData(data: List<String>?) {
+        if (data != null)
+            mutableFilterData.value = data
+    }
 }

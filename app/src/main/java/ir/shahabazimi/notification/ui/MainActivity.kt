@@ -1,6 +1,5 @@
 package ir.shahabazimi.notification.ui
 
-import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -25,6 +24,7 @@ class MainActivity : AppCompatActivity() {
       b.topAppBar.title = getString(R.string.main_date, newValue)
     }
     private val viewModel: SharedViewModel by viewModels()
+    private val apps= mutableListOf<Pair<String,Boolean>>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,6 +38,12 @@ class MainActivity : AppCompatActivity() {
 
         db = Realm.getDefaultInstance()
 
+        apps.clear()
+
+        db.copyFromRealm(db.where<NotificationModel>().distinct("packageName").sort("appName",Sort.DESCENDING).findAll()).forEach {
+            apps.add(Pair(it.appName,true))
+        }
+
         onClicks()
 
     }
@@ -49,6 +55,11 @@ class MainActivity : AppCompatActivity() {
             when (menuItem.itemId) {
                 R.id.appbar_menu_filter -> {
                     filter()
+                    true
+                }
+
+                R.id.appbar_menu_date->{
+                    selectDate()
                     true
                 }
                 else -> false
@@ -69,18 +80,7 @@ class MainActivity : AppCompatActivity() {
 
         datePicker.addOnPositiveButtonClickListener {
             viewModel.selectDate(it)
-//            notificationAdapter.updateData(
-//                db.where<NotificationModel>().equalTo(
-//                    "date",
-//                    SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(Date(it))
-//                )
-//                    .equalTo("visible", true)
-//                    .isNotEmpty("title")
-//                    .sort("time", Sort.DESCENDING)
-//                    .findAllAsync()
-//            )
             date = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()).format(it)
-
         }
 
         datePicker.show(supportFragmentManager, null)
@@ -89,38 +89,24 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun filter() {
-        val data = db.copyFromRealm(db.where<NotificationModel>().distinct("packageName").findAll())
-        val selected = mutableListOf<Boolean>()
-        val appsPackage = mutableListOf<String>()
-        val apps = mutableListOf<String>()
-        data.forEach {
-            selected.add(it.visible)
-            appsPackage.add(it.packageName)
-            apps.add(
-                packageManager.getApplicationLabel(
-                    packageManager.getApplicationInfo(
-                        it.packageName,
-                        PackageManager.GET_META_DATA
-                    )
-                ).toString()
-            )
-        }
-
         val dialog = MaterialAlertDialogBuilder(this)
+            .setCancelable(false)
             .setTitle("Select Apps")
             .setMultiChoiceItems(
-                apps.toTypedArray(),
-                selected.toBooleanArray()
-            ) { _, i, b ->
-                db.executeTransactionAsync { realm ->
-                    realm.where<NotificationModel>().equalTo("packageName", appsPackage[i])
-                        .findAll()?.setBoolean("visible", b)
-                }
+                apps.map { it.first }.toTypedArray(),
+                apps.map { it.second }.toBooleanArray()
+            ) { _, index, selected ->
+                apps[index]=apps[index].copy(second = selected)
             }
             .setPositiveButton(
                 "done"
             ) { dialog, _ ->
-
+                val visible = mutableListOf<String>()
+                apps.forEach {
+                    if(it.second)
+                        visible.add(it.first)
+                }
+                viewModel.filterData(visible)
                 dialog.dismiss()
             }
 

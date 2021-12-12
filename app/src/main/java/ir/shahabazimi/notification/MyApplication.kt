@@ -13,7 +13,7 @@ class MyApplication : Application() {
         Realm.init(this)
         val config = RealmConfiguration.Builder()
             .name("notification.realm")
-            .schemaVersion(6)
+            .schemaVersion(1)
             .allowWritesOnUiThread(true)
             .allowQueriesOnUiThread(true)
             .build()

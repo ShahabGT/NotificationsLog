@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textview.MaterialTextView
 import io.realm.OrderedRealmCollection
 import io.realm.RealmRecyclerViewAdapter
+import ir.shahabazimi.notification.databinding.RowNotificationBinding
 
 
 class NotificationAdapter(
@@ -21,42 +22,38 @@ class NotificationAdapter(
     RealmRecyclerViewAdapter<NotificationModel, NotificationAdapter.ViewHolder>(data, true) {
 
 
-    class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
-        val icon: ImageView = v.findViewById(R.id.row_notification_icon)
-        val title: MaterialTextView = v.findViewById(R.id.row_notification_title)
-        val text: MaterialTextView = v.findViewById(R.id.row_notification_text)
-        val date: MaterialTextView = v.findViewById(R.id.row_notification_date)
+    inner class ViewHolder(private val b: RowNotificationBinding) :
+        RecyclerView.ViewHolder(b.root) {
+        @SuppressLint("SetTextI18n")
+        fun bind(model: NotificationModel) {
+            b.rowNotificationAppname.text = model.appName
+
+            if (model.title.isEmpty())
+                b.rowNotificationTitle.visibility = View.GONE
+            else
+                b.rowNotificationTitle.text = model.title
+
+            if (model.text.isEmpty())
+                b.rowNotificationText.visibility = View.GONE
+            else
+                b.rowNotificationText.text = model.text
+
+            if (model.packageName.isNotEmpty())
+                b.rowNotificationIcon.setImageDrawable(ctx.packageManager.getApplicationIcon(model.packageName))
+
+            b.rowNotificationDate.text = "${model.date} ${model.time}"
+
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         ViewHolder(
-            LayoutInflater.from(parent.context).inflate(R.layout.row_notification, parent, false)
+            RowNotificationBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         )
 
-    @SuppressLint("ClickableViewAccessibility", "SetTextI18n")
     override fun onBindViewHolder(h: ViewHolder, position: Int) {
         val model = getItem(position)
-        if (model != null) {
-            h.title.text = model.title
-            h.text.text = model.text
-            h.text.visibility = if (model.text.isEmpty())
-                View.GONE
-            else
-                View.VISIBLE
-            if (model.packageName.isNotEmpty())
-                h.icon.setImageDrawable(ctx.packageManager.getApplicationIcon(model.packageName))
-            h.date.text = "${model.date} ${model.time}"
-
-
-//            h.itemView.setOnTouchListener { v, event ->
-//                if (event.action === MotionEvent.ACTION_DOWN) {
-//                    actionDown(model.key)
-//                } else {
-//                    actionUp()
-//                }
-//                true
-//            }
-        }
-
+        if (model != null)
+            h.bind(model)
     }
 }

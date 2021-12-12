@@ -6,4 +6,10 @@
         android:icon="@drawable/ic_round_filter_list_24"
         android:title="@string/appbar_menu_filter"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/appbar_menu_date"
+        android:icon="@drawable/ic_round_filter_list_24"
+        android:title="@string/appbar_menu_date"
+        app:showAsAction="never" />
 </menu>
