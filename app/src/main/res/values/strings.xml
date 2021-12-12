@@ -10,4 +10,13 @@
     <string name="notification_empty_title">Noting Found :(</string>
     <string name="notification_empty_logo_content">no content found image</string>
 
+    <string name="app_select_dialog_title">Filter Apps to Show</string>
+
+    <string name="notification_dialog_title">Access Notifications</string>
+    <string name="notification_dialog_message">This app needs to access your device notifications in order to work. please enable notification access for "Notification" in the settings</string>
+
+    <string name="dialog_done">Done</string>
+    <string name="dialog_allow">Allow</string>
+    <string name="dialog_deny">Deny</string>
+
 </resources>

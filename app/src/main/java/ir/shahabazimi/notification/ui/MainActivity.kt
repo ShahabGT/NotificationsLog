@@ -1,8 +1,12 @@
 package ir.shahabazimi.notification.ui
 
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationManagerCompat
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.realm.Realm
@@ -21,10 +25,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var b: ActivityMainBinding
     private lateinit var db: Realm
     private var date by Delegates.observable("") { _, _, newValue ->
-      b.topAppBar.title = getString(R.string.main_date, newValue)
+        b.topAppBar.title = getString(R.string.main_date, newValue)
     }
     private val viewModel: SharedViewModel by viewModels()
-    private val apps= mutableListOf<Pair<String,Boolean>>()
+    private val apps = mutableListOf<Pair<String, Boolean>>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,15 +44,23 @@ class MainActivity : AppCompatActivity() {
 
         apps.clear()
 
-        db.copyFromRealm(db.where<NotificationModel>().distinct("packageName").sort("appName",Sort.DESCENDING).findAll()).forEach {
-            apps.add(Pair(it.appName,true))
+        db.copyFromRealm(
+            db.where<NotificationModel>().distinct("packageName").sort("appName", Sort.DESCENDING)
+                .findAll()
+        ).forEach {
+            apps.add(Pair(it.appName, true))
         }
 
         onClicks()
 
     }
 
-    private fun onClicks(){
+    override fun onResume() {
+        super.onResume()
+        checkForPermission()
+    }
+
+    private fun onClicks() {
         b.mainFab.setOnClickListener { selectDate() }
 
         b.topAppBar.setOnMenuItemClickListener { menuItem ->
@@ -58,7 +70,7 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
 
-                R.id.appbar_menu_date->{
+                R.id.appbar_menu_date -> {
                     selectDate()
                     true
                 }
@@ -87,23 +99,22 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-
     private fun filter() {
         val dialog = MaterialAlertDialogBuilder(this)
             .setCancelable(false)
-            .setTitle("Select Apps")
+            .setTitle(R.string.app_select_dialog_title)
             .setMultiChoiceItems(
                 apps.map { it.first }.toTypedArray(),
                 apps.map { it.second }.toBooleanArray()
             ) { _, index, selected ->
-                apps[index]=apps[index].copy(second = selected)
+                apps[index] = apps[index].copy(second = selected)
             }
             .setPositiveButton(
-                "done"
+                R.string.dialog_done
             ) { dialog, _ ->
                 val visible = mutableListOf<String>()
                 apps.forEach {
-                    if(it.second)
+                    if (it.second)
                         visible.add(it.first)
                 }
                 viewModel.filterData(visible)
@@ -111,6 +122,39 @@ class MainActivity : AppCompatActivity() {
             }
 
         dialog.show()
+    }
+
+
+
+    private fun checkForPermission() {
+        val res = NotificationManagerCompat.getEnabledListenerPackages(this).contains(packageName)
+        if (!res)
+            notificationDialog()
+    }
+
+    private fun notificationDialog() {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.notification_dialog_title)
+            .setCancelable(false)
+            .setMessage(R.string.notification_dialog_message)
+
+//            .setNegativeButton(resources.getString(R.string.dialog_deny)) { dialog, _ ->
+//                dialog.dismiss()
+//            }
+            .setPositiveButton(resources.getString(R.string.dialog_allow)) { _, _ ->
+                askForPermission()
+            }
+            .show()
+    }
+
+    private fun askForPermission() {
+        startActivity(
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1)
+                Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
+            else
+                Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS")
+        )
+
     }
 
 
