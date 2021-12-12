@@ -9,6 +9,6 @@ open class NotificationModel(
     var appName: String = "",
     var title: String = "",
     var text: String = "",
-    var date: String = "",
-    var time: String = ""
+    var date: Long = 0L,
+    var dateString: String = ""
 ) : RealmObject()

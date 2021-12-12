@@ -1,13 +1,12 @@
 <resources>
     <string name="app_name">Notification</string>
 
-    <string name="main_date">%s</string>
     <string name="appbar_menu_filter">Filter</string>
     <string name="appbar_menu_date">Select Date</string>
 
     <string name="main_fab_content">this is used to filter date</string>
 
-    <string name="notification_empty_title">Noting Found :(</string>
+    <string name="notification_empty_title">Noting to show</string>
     <string name="notification_empty_logo_content">no content found image</string>
 
     <string name="app_select_dialog_title">Filter Apps to Show</string>
@@ -17,6 +16,5 @@
 
     <string name="dialog_done">Done</string>
     <string name="dialog_allow">Allow</string>
-    <string name="dialog_deny">Deny</string>
 
 </resources>

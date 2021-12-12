@@ -25,11 +25,8 @@ class NotificationService : NotificationListenerService() {
                         ).toString(),
                         sbn.notification.extras.getString("android.title", ""),
                         sbn.notification.extras.getString("android.text", ""),
-                        SimpleDateFormat(
-                            "yyyy/MM/dd",
-                            Locale.getDefault()
-                        ).format(Date(sbn.postTime)),
-                        SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date(sbn.postTime))
+                        sbn.postTime,
+                        SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(sbn.postTime)
 
                     )
                 )

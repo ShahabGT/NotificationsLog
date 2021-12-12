@@ -21,7 +21,6 @@ import java.util.*
 class NotificationsFragment : Fragment() {
 
     private lateinit var b: FragmentNotificationsBinding
-    private lateinit var db: Realm
     private lateinit var notificationAdapter: NotificationAdapter
     private val viewModel: SharedViewModel by activityViewModels()
 
@@ -40,29 +39,28 @@ class NotificationsFragment : Fragment() {
     }
 
     private fun init() {
-        db = Realm.getDefaultInstance()
         notificationAdapter = NotificationAdapter(
-            requireContext(), db.where<NotificationModel>()
+            requireContext(),  Realm.getDefaultInstance().where<NotificationModel>()
                 .equalTo(
-                    "date",
+                    "dateString",
                     SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(
                         Date()
                     )
                 )
                 .isNotEmpty("title")
-                .sort("time", Sort.DESCENDING)
+                .sort("date", Sort.DESCENDING)
                 .findAll()
         )
         b.notificationsRecycler.adapter = notificationAdapter
 
         viewModel.selectedDate.observe(viewLifecycleOwner) {
             notificationAdapter.updateData(
-                db.where<NotificationModel>().equalTo(
-                    "date",
+                Realm.getDefaultInstance().where<NotificationModel>().equalTo(
+                    "dateString",
                     SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(Date(it))
                 )
                     .isNotEmpty("title")
-                    .sort("time", Sort.DESCENDING)
+                    .sort("date", Sort.DESCENDING)
                     .findAll()
 
 
@@ -70,13 +68,11 @@ class NotificationsFragment : Fragment() {
             emptyDetector()
         }
         viewModel.filteredData.observe(viewLifecycleOwner){ visible->
-            notificationAdapter.updateData(db.where<NotificationModel>().`in`("appName",visible.toTypedArray()).findAll())
+            notificationAdapter.updateData( Realm.getDefaultInstance().where<NotificationModel>().`in`("appName",visible.toTypedArray()).findAll())
             emptyDetector()
 
         }
         emptyDetector()
-
-        onClicks()
 
     }
 
@@ -86,10 +82,5 @@ class NotificationsFragment : Fragment() {
         else
             b.notificationEmpty.visibility=View.INVISIBLE
     }
-
-    private fun onClicks() {
-
-    }
-
 
 }

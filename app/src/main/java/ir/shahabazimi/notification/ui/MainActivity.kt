@@ -4,9 +4,12 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationManagerCompat
+import com.google.android.material.datepicker.CalendarConstraints
+import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.realm.Realm
@@ -23,8 +26,8 @@ import kotlin.properties.Delegates
 class MainActivity : AppCompatActivity() {
 
     private lateinit var b: ActivityMainBinding
-    private var date by Delegates.observable("") { _, _, newValue ->
-        b.topAppBar.title = getString(R.string.main_date, newValue)
+    private var selectedDate by Delegates.observable(0L) { _, _, newValue ->
+        b.topAppBar.title =  SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH).format(newValue)
     }
     private val viewModel: SharedViewModel by viewModels()
     private val apps = mutableListOf<Pair<String, Boolean>>()
@@ -37,16 +40,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun init() {
-        date = SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(Date())
-        apps.clear()
-
-        Realm.getDefaultInstance().where<NotificationModel>().distinct("packageName").sort("appName", Sort.DESCENDING)
-                .findAll().forEach {
-            apps.add(Pair(it.appName, true))
-        }
-
+        selectedDate=Date().time
+        visibleApps()
         onClicks()
 
+    }
+
+    private fun visibleApps(){
+        apps.clear()
+
+        Realm.getDefaultInstance().where<NotificationModel>().distinct("packageName")
+            .equalTo("dateString",SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()).format(selectedDate))
+            .sort("appName", Sort.DESCENDING)
+            .findAll().forEach {
+                apps.add(Pair(it.appName, true))
+            }
     }
 
     override fun onResume() {
@@ -72,15 +80,22 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun selectDate() {
+        val constraintsBuilder =
+            CalendarConstraints.Builder()
+                .setValidator(
+                    DateValidatorPointBackward.now())
         val datePicker =
             MaterialDatePicker.Builder.datePicker()
-                .setTitleText("Select date")
-                .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+                .setTitleText(R.string.appbar_menu_date)
+                .setSelection(selectedDate)
+                .setCalendarConstraints(constraintsBuilder.build())
                 .build()
+
 
         datePicker.addOnPositiveButtonClickListener {
             viewModel.selectDate(it)
-            date = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()).format(it)
+            selectedDate=it
+            visibleApps()
         }
 
         datePicker.show(supportFragmentManager, null)
@@ -108,10 +123,11 @@ class MainActivity : AppCompatActivity() {
                 viewModel.filterData(visible)
                 dialog.dismiss()
             }
-
-        dialog.show()
+        if (!apps.isNullOrEmpty())
+            dialog.show()
+        else
+            Toast.makeText(this, R.string.notification_empty_title, Toast.LENGTH_SHORT).show()
     }
-
 
 
     private fun checkForPermission() {
