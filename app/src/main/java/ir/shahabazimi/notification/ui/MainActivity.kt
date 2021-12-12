@@ -15,9 +15,9 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.realm.Realm
 import io.realm.Sort
 import io.realm.kotlin.where
-import ir.shahabazimi.notification.NotificationModel
+import ir.shahabazimi.notification.models.NotificationModel
 import ir.shahabazimi.notification.R
-import ir.shahabazimi.notification.SharedViewModel
+import ir.shahabazimi.notification.models.SharedViewModel
 import ir.shahabazimi.notification.databinding.ActivityMainBinding
 import java.text.SimpleDateFormat
 import java.util.*
@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun init() {
-        selectedDate=Date().time
+        selectedDate= System.currentTimeMillis()
         visibleApps()
         onClicks()
 

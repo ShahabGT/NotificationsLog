@@ -6,13 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import androidx.recyclerview.widget.RecyclerView
 import io.realm.Realm
 import io.realm.Sort
 import io.realm.kotlin.where
-import ir.shahabazimi.notification.NotificationAdapter
-import ir.shahabazimi.notification.NotificationModel
-import ir.shahabazimi.notification.SharedViewModel
+import ir.shahabazimi.notification.classes.NotificationAdapter
+import ir.shahabazimi.notification.models.NotificationModel
+import ir.shahabazimi.notification.models.SharedViewModel
 import ir.shahabazimi.notification.databinding.FragmentNotificationsBinding
 import java.text.SimpleDateFormat
 import java.util.*

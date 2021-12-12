@@ -1,4 +1,4 @@
-package ir.shahabazimi.notification
+package ir.shahabazimi.notification.models
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
