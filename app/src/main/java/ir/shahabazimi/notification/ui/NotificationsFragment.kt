@@ -53,20 +53,7 @@ class NotificationsFragment : Fragment() {
                 .sort("time", Sort.DESCENDING)
                 .findAll()
         )
-        b.notificationsRecycler.apply {
-            adapter = notificationAdapter
-            addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                    if (dy > 0) {
-                        //      b.mainFab.hide()
-                    } else {
-                        //    b.mainFab.show()
-                    }
-                }
-            })
-        }
-
-        b.notificationsRecycler.adapter
+        b.notificationsRecycler.adapter = notificationAdapter
 
         viewModel.selectedDate.observe(viewLifecycleOwner) {
             notificationAdapter.updateData(

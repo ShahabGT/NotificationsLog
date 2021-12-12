@@ -23,7 +23,6 @@ import kotlin.properties.Delegates
 class MainActivity : AppCompatActivity() {
 
     private lateinit var b: ActivityMainBinding
-    private lateinit var db: Realm
     private var date by Delegates.observable("") { _, _, newValue ->
         b.topAppBar.title = getString(R.string.main_date, newValue)
     }
@@ -39,15 +38,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun init() {
         date = SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(Date())
-
-        db = Realm.getDefaultInstance()
-
         apps.clear()
 
-        db.copyFromRealm(
-            db.where<NotificationModel>().distinct("packageName").sort("appName", Sort.DESCENDING)
-                .findAll()
-        ).forEach {
+        Realm.getDefaultInstance().where<NotificationModel>().distinct("packageName").sort("appName", Sort.DESCENDING)
+                .findAll().forEach {
             apps.add(Pair(it.appName, true))
         }
 
@@ -61,8 +55,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onClicks() {
-        b.mainFab.setOnClickListener { selectDate() }
-
         b.topAppBar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.appbar_menu_filter -> {
@@ -76,19 +68,15 @@ class MainActivity : AppCompatActivity() {
                 }
                 else -> false
             }
-
-
         }
     }
 
     private fun selectDate() {
-
         val datePicker =
             MaterialDatePicker.Builder.datePicker()
                 .setTitleText("Select date")
                 .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
                 .build()
-
 
         datePicker.addOnPositiveButtonClickListener {
             viewModel.selectDate(it)
@@ -137,10 +125,6 @@ class MainActivity : AppCompatActivity() {
             .setTitle(R.string.notification_dialog_title)
             .setCancelable(false)
             .setMessage(R.string.notification_dialog_message)
-
-//            .setNegativeButton(resources.getString(R.string.dialog_deny)) { dialog, _ ->
-//                dialog.dismiss()
-//            }
             .setPositiveButton(resources.getString(R.string.dialog_allow)) { _, _ ->
                 askForPermission()
             }
