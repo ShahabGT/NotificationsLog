@@ -12,22 +12,22 @@ class NotificationService : NotificationListenerService() {
 
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
         if (sbn != null) {
-            Realm.getDefaultInstance().executeTransaction {
+            val appName = packageManager.getApplicationLabel(
+                packageManager.getApplicationInfo(
+                    sbn.packageName,
+                    PackageManager.GET_META_DATA
+                )
+            ).toString()
+            Realm.getDefaultInstance().executeTransactionAsync {
                 it.insert(
                     NotificationModel(
                         sbn.key,
                         sbn.packageName,
-                        packageManager.getApplicationLabel(
-                            packageManager.getApplicationInfo(
-                                sbn.packageName,
-                                PackageManager.GET_META_DATA
-                            )
-                        ).toString(),
+                        appName,
                         sbn.notification.extras.getString("android.title", ""),
                         sbn.notification.extras.getString("android.text", ""),
                         sbn.postTime,
                         SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH).format(sbn.postTime)
-
                     )
                 )
             }

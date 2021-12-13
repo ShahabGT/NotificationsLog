@@ -1,6 +1,8 @@
 package ir.shahabazimi.notification.ui
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -22,12 +24,16 @@ import ir.shahabazimi.notification.databinding.ActivityMainBinding
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.properties.Delegates
+import android.content.ContentResolver
+
+
+
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var b: ActivityMainBinding
     private var selectedDate by Delegates.observable(0L) { _, _, newValue ->
-        b.topAppBar.title =  SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH).format(newValue)
+        b.topAppBar.title = SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH).format(newValue)
     }
     private val viewModel: SharedViewModel by viewModels()
     private val apps = mutableListOf<Pair<String, Boolean>>()
@@ -40,18 +46,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun init() {
-        selectedDate= System.currentTimeMillis()
+        selectedDate = System.currentTimeMillis()
         visibleApps()
         onClicks()
 
     }
 
-    private fun visibleApps(){
+    private fun visibleApps() {
         apps.clear()
 
         Realm.getDefaultInstance().where<NotificationModel>().distinct("packageName")
-            .equalTo("dateString",SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()).format(selectedDate))
-            .sort("appName", Sort.DESCENDING)
+            .equalTo(
+                "dateString",
+                SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()).format(selectedDate)
+            )
+            .sort("appName", Sort.ASCENDING)
             .findAll().forEach {
                 apps.add(Pair(it.appName, true))
             }
@@ -83,7 +92,8 @@ class MainActivity : AppCompatActivity() {
         val constraintsBuilder =
             CalendarConstraints.Builder()
                 .setValidator(
-                    DateValidatorPointBackward.now())
+                    DateValidatorPointBackward.now()
+                )
         val datePicker =
             MaterialDatePicker.Builder.datePicker()
                 .setTitleText(R.string.appbar_menu_date)
@@ -94,7 +104,7 @@ class MainActivity : AppCompatActivity() {
 
         datePicker.addOnPositiveButtonClickListener {
             viewModel.selectDate(it)
-            selectedDate=it
+            selectedDate = it
             visibleApps()
         }
 
@@ -135,6 +145,7 @@ class MainActivity : AppCompatActivity() {
         if (!res)
             notificationDialog()
     }
+
 
     private fun notificationDialog() {
         MaterialAlertDialogBuilder(this)
